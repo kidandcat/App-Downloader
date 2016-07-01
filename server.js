@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var fs = require('fs');
 var Downloader = require('mt-files-downloader');
 var downloader = new Downloader();
 var exec = require('child_process').exec;
@@ -55,6 +56,7 @@ app.get('/download/:url/:email', function(req, res, next) {
 
 app.get('/clean', function(req, res, next) {
     rmDir('./public/downloads');
+    res.send('OK');
 });
 
 app.use(function(err, req, res, next) {
@@ -84,6 +86,7 @@ function rmDir(dirPath) {
     try {
         var files = fs.readdirSync(dirPath);
     } catch (e) {
+      console.log('ERR', e);
         return;
     }
     if (files.length > 0)
