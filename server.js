@@ -53,8 +53,8 @@ app.get('/download/:url/:email', function(req, res, next) {
 
 
 
-app.get('/', function(req, res, next) {
-    res.send('Running');
+app.get('/clean', function(req, res, next) {
+    rmDir('./public/downloads');
 });
 
 app.use(function(err, req, res, next) {
@@ -94,5 +94,4 @@ function rmDir(dirPath) {
             else
                 rmDir(filePath);
         }
-    fs.rmdirSync(dirPath);
 }
