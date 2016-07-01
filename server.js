@@ -29,12 +29,12 @@ app.get('/download/:url/:email', function(req, res, next) {
     console.log('GET:', req.params.email + ' - ' + url);
     var randomName = makeid();
     var name = url.split('/').pop();
-    var dl = downloader.download(url, 'public/downloads/' + randomName + name.split('.').pop());
+    var dl = downloader.download(url, 'public/downloads/' + randomName + '.' + name.split('.').pop());
     dl.start();
 
     dl.on('end', function(dl) {
         exec('echo "Your download ' + name + ' has finished.\n Download at full speed: ' +
-            HOSTNAME + ':' + PORT + '/downloads/' + randomName + name.split('.').pop() +
+            HOSTNAME + ':' + PORT + '/downloads/' + randomName + '.' + name.split('.').pop() +
             '" |' + 'sendmail ' + req.params.email,
             function(err, stdout, stderr) {
                 console.log('Email sent to ' + req.params.email + ' -> Success');
