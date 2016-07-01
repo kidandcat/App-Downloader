@@ -4,6 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
+    "install": "npm install -g riot-cli",
     "start": "riot public/components/ public/components.js && node server.js"
   },
   "author": "",
