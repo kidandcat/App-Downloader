@@ -3,10 +3,10 @@ var bodyParser = require('body-parser');
 var fs = require('fs');
 var Downloader = require('mt-files-downloader');
 var downloader = new Downloader();
+var ProgressBar = require('progress');
 var exec = require('child_process').exec;
 
-var HOSTNAME = 'http://192.168.1.100';
-var PORT = 8000;
+var PORT = 8009;
 
 var app = express();
 app.use(bodyParser.json());
@@ -25,16 +25,40 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.get('/download/:url/:email', function(req, res, next) {
-    var url = Buffer.from(req.params.url, 'base64').toString("ascii");
+    var url = Buffer.from(req.params.url.split('*').join('/'), 'base64').toString("ascii");
     console.log('GET:', req.params.email + ' - ' + url);
     var randomName = makeid();
     var name = url.split('/').pop();
     var dl = downloader.download(url, 'public/downloads/' + randomName + '.' + name.split('.').pop());
     dl.start();
 
+    var data = dl.getStats();
+    var bar = new ProgressBar(name + ' [:bar] :percent :etas', {
+        complete: '=',
+        incomplete: ' ',
+        width: 90,
+        current: data.total.downloaded,
+        total: ((data.total.size != 0) ? data.total.size : 100)
+    });
+
+
+    var int = setInterval(function() {
+        var data = dl.getStats();
+        if (data.total.size != 0) {
+            bar.total = data.total.size;
+            if (data.threadStatus.open == 0) {
+                clearInterval(int);
+            }
+        }
+        bar.update(data.total.completed / 100);
+    }, 500);
+
+
     dl.on('end', function(dl) {
+        console.log('FINISHED');
+        clearInterval(int);
         exec('echo "Your download ' + name + ' has finished.\n Download at full speed: ' +
-            HOSTNAME + ':' + PORT + '/downloads/' + randomName + '.' + name.split('.').pop() +
+            req.headers.host + ':' + PORT + '/downloads/' + randomName + '.' + name.split('.').pop() +
             '" |' + 'sendmail ' + req.params.email,
             function(err, stdout, stderr) {
                 console.log('Email sent to ' + req.params.email + ' -> Success');
@@ -42,6 +66,8 @@ app.get('/download/:url/:email', function(req, res, next) {
 
     });
     dl.on('error', function(dl) {
+        console.log('ERROR');
+        clearInterval(int);
         exec('echo "Your download ' + name + ' has failed.', function(err, stdout, stderr) {
             console.log('Email sent to ' + req.params.email + ' -> Fail');
             console.log('ERR', dl.error);
@@ -85,7 +111,7 @@ function rmDir(dirPath) {
     try {
         var files = fs.readdirSync(dirPath);
     } catch (e) {
-      console.log('ERR', e);
+        console.log('ERR', e);
         return;
     }
     if (files.length > 0)

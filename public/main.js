@@ -8,7 +8,7 @@ window.onload = function() {
         var url = document.querySelector('#url').value;
         var email = document.querySelector('#email').value;
 
-        get('/download/' + btoa(url) + '/' + email, function(res) {
+        get('/download/' + btoa(url).split('/').join('*') + '/' + email, function(res) {
             deactivateModal();
             console.log('Res', res);
             document.querySelector('#url').value = '';
