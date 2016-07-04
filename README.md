@@ -6,7 +6,7 @@ It starts downloading that URL using multithreading for being fault tolerant and
 When it ends, it sends an email to the email input before with a link.
 
 
-### It purpose is to have a 24/7 server to download those big files served at low download speed (200KB/s), then download the file from your server at full speed.
+### Its purpose is to have a 24/7 server to download those big files served at low download speed (200KB/s), then download the file from your server at full speed.
 
 ## Configuration
 Configure the ip and port in server.js
