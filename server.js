@@ -9,7 +9,6 @@ var HOSTNAME = 'http://192.168.1.100';
 var PORT = 8000;
 
 var app = express();
-app.listen(PORT);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
@@ -65,8 +64,8 @@ app.use(function(err, req, res, next) {
     res.send('Error ');
 });
 
-app.listen(10000, function() {
-    console.log('Listening on port 10000!');
+app.listen(PORT, function() {
+    console.log('Listening on port ' + PORT + '!');
 });
 
 
